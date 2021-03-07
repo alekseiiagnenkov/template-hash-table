@@ -79,20 +79,17 @@ class OpenHashSet<T>(private val capacity: Int) {
      * Таблицы равны, если в них одинаковое количество элементов,
      * и любой элемент из второй таблицы входит также и в первую
      */
-/*    override fun equals(other: OpenHashSet<T>): Boolean {
-        if(this.maxSize == other.maxSize && this.size==other.size) {
-            for (i in 0..this.maxSize) {
-                if(this.elements[i] != other.elements[i]){ return false }
-            }
-            return true
-        }
-        return false
-    }*/
 
     override fun equals(other: Any?): Boolean {
         if (other?.javaClass != javaClass) return false
         other as OpenHashSet<T>
-        if (!Arrays.equals(this.elements, other.elements)) return false
-        return true
+        if (other.size == this.size && other.maxSize == this.maxSize) {
+            for (i in 0..(this.size-1)) {
+                if (this.elements[i] != other.elements[i])
+                    return false
+            }
+            return true
+        }
+        return false
     }
 }
