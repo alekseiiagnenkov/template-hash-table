@@ -66,11 +66,14 @@ class OpenHashSet<T>(private val capacity: Int) {
      */
     operator fun contains(element: T): Boolean {
         var i = 0
-        while (this.elements[(element.hashCode() + i) % capacity] != null && i < this.capacity) {
+        while (this.elements[(element.hashCode() + i) % capacity] != null) {
             if (this.elements[(element.hashCode() + i) % capacity] == element) {
                 return true
             }
             i++
+            if (i == this.capacity) {
+                break
+            }
         }
         return false
     }
@@ -84,9 +87,21 @@ class OpenHashSet<T>(private val capacity: Int) {
         if (other?.javaClass != javaClass) return false
         other as OpenHashSet<T>
         if (other.size == this.size && other.maxSize == this.maxSize) {
-            for (i in 0..(this.size-1)) {
-                if (this.elements[i] != other.elements[i])
-                    return false
+            for (i in 0..(this.size - 1)) {
+                if (this.elements[i] != null) {
+                    val index = this.elements[i].hashCode() % this.capacity
+                    var j = 0
+                    var flag=false
+                    while (other.elements[index + j] != null){
+                        if(other.elements[index + j] == this.elements[i]){
+                            flag=true
+                        }
+                        j++
+                    }
+                    if(flag==false)
+                        return false
+                }
+                return false
             }
             return true
         }
