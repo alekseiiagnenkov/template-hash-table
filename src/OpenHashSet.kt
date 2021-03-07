@@ -1,4 +1,4 @@
-import java.util.*
+import javax.management.openmbean.ArrayType
 
 /**
  * Класс "хеш-таблица с открытой адресацией"
@@ -13,7 +13,7 @@ import java.util.*
  *
  * В конструктор хеш-таблицы передаётся её вместимость (максимальное количество элементов)
  */
-class OpenHashSet<T>(private val capacity: Int) {
+class OpenHashSet<T>(val capacity: Int) {
 
     /**
      * Массив для хранения элементов хеш-таблицы
@@ -38,6 +38,8 @@ class OpenHashSet<T>(private val capacity: Int) {
     fun isEmpty(): Boolean {
         return if (this.count > 0) false else true
     }
+
+    private fun Any?.hashCode(): Int = this?.hashCode() ?: 0
 
     /**
      * Добавление элемента.
@@ -86,22 +88,29 @@ class OpenHashSet<T>(private val capacity: Int) {
     override fun equals(other: Any?): Boolean {
         if (other?.javaClass != javaClass) return false
         other as OpenHashSet<T>
-        if (other.size == this.size && other.maxSize == this.maxSize) {
+        if (other.size == this.size) {
             for (i in 0..(this.size - 1)) {
                 if (this.elements[i] != null) {
-                    val index = this.elements[i].hashCode() % this.capacity
+                    var index = (this.elements[i].hashCode() % this.capacity)
                     var j = 0
-                    var flag=false
-                    while (other.elements[index + j] != null){
-                        if(other.elements[index + j] == this.elements[i]){
-                            flag=true
+                    var count = 0
+                    var flag = false
+                    while (other.elements[index + j] != null) {
+                        if (other.elements[index + j] == this.elements[i]) {
+                            flag = true
                         }
                         j++
+                        count++
+                        if((index + j)==other.capacity){
+                            index = 0
+                            j=0
+                        }
+                        if(count == other.capacity)
+                            break
                     }
-                    if(flag==false)
+                    if (flag == false)
                         return false
                 }
-                return false
             }
             return true
         }
